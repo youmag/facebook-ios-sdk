@@ -35,6 +35,7 @@
   UIButton* _closeButton;
   UIInterfaceOrientation _orientation;
   BOOL _showingKeyboard;
+  BOOL _showLoadingScreen;
 
   // Ensures that UI elements behind the dialog are disabled.
   UIView* _modalBackgroundView;
@@ -52,8 +53,13 @@
 
 - (NSString *) getStringFromUrl: (NSString*) url needle:(NSString *) needle;
 
+/*
+ * Initialize the dialog, specifying whether it should follow
+ * frictionless rules (no loading screen).
+ */
 - (id)initWithURL: (NSString *) loadingURL
            params: (NSMutableDictionary *) params
+showLoadingScreen: (BOOL) showLoadingScreen
          delegate: (id <FBDialogDelegate>) delegate;
 
 /**

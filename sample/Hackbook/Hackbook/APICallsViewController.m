@@ -464,6 +464,7 @@
     HackbookAppDelegate *delegate = (HackbookAppDelegate *) [[UIApplication sharedApplication] delegate];  
     [[delegate facebook] dialog:@"apprequests"
                       andParams:params
+        andFrictionlessRequests:true
                     andDelegate:self];
 }
 
@@ -496,6 +497,7 @@
     HackbookAppDelegate *delegate = (HackbookAppDelegate *) [[UIApplication sharedApplication] delegate];  
     [[delegate facebook] dialog:@"apprequests"
                       andParams:params
+        andFrictionlessRequests:true
                     andDelegate:self];
 }
 
@@ -514,11 +516,14 @@
     HackbookAppDelegate *delegate = (HackbookAppDelegate *) [[UIApplication sharedApplication] delegate];  
     [[delegate facebook] dialog:@"apprequests"
                       andParams:params
+        andFrictionlessRequests:true
                     andDelegate:self];
 }
 
 /*
- * Dialog: Request - send to a targeted friend.
+ * Dialog: Request - send to a targeted friend. Because frictionless requests is true,
+ * the dialog will not appear at all if you have already sent to that friend (and didn't uncheck
+ * the box that says "Don't ask me again for these friends")
  */
 - (void)apiDialogRequestsSendTarget:(NSString *)friend {
     currentAPICall = kDialogRequestsSendToTarget;
@@ -530,6 +535,7 @@
     HackbookAppDelegate *delegate = (HackbookAppDelegate *) [[UIApplication sharedApplication] delegate];  
     [[delegate facebook] dialog:@"apprequests"
                       andParams:params
+        andFrictionlessRequests: true
                     andDelegate:self];
 }
 
@@ -1044,7 +1050,9 @@
         {
             NSArray *resultData = [result objectForKey:@"data"];
             if ([resultData count] > 0) {
-                [self apiDialogRequestsSendTarget:[[resultData objectAtIndex:0] objectForKey:@"id"]];
+                NSString* friend = [[resultData objectAtIndex:(arc4random() % [resultData count])] objectForKey:@"id"];
+                friend = @"20901205";
+                [self apiDialogRequestsSendTarget:friend];
             } else {
                 [self showMessage:@"You have no friends to select."];
             }

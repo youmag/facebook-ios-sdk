@@ -55,7 +55,6 @@ static NSString* kSDKVersion = @"2";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // private
 
-
 - (id)initWithAppId:(NSString *)appId
         andDelegate:(id<FBSessionDelegate>)delegate {
   self = [self initWithAppId:appId urlSchemeSuffix:nil andDelegate:delegate];
@@ -554,35 +553,23 @@ static NSString* kSDKVersion = @"2";
 }
 
 /**
- * Generate a UI dialog for the request action.
- *
- * @param action
- *            String representation of the desired method: e.g. "login",
- *            "feed", ...
- * @param delegate
- *            Callback interface to notify the calling application when the
- *            dialog has completed.
- */
-- (void)dialog:(NSString *)action
-   andDelegate:(id<FBDialogDelegate>)delegate {
-  NSMutableDictionary * params = [NSMutableDictionary dictionary];
-  [self dialog:action andParams:params andDelegate:delegate];
-}
-
-/**
  * Generate a UI dialog for the request action with the provided parameters.
  *
  * @param action
  *            String representation of the desired method: e.g. "login",
  *            "feed", ...
  * @param parameters
- *            key-value string parameters
+ *            key-value string parameters as defined in the FB.ui documentation.
+ * @param frictionless
+ *            if true, then the apprequests dialog will not show for users that
+ *            have previously sent requests to each other (and didn't opt out)
  * @param delegate
  *            Callback interface to notify the calling application when the
  *            dialog has completed.
  */
 - (void)dialog:(NSString *)action
      andParams:(NSMutableDictionary *)params
+     andFrictionlessRequests:(BOOL)frictionless
    andDelegate:(id <FBDialogDelegate>)delegate {
 
   [_fbDialog release];
@@ -601,10 +588,39 @@ static NSString* kSDKVersion = @"2";
       [params setValue:[self.accessToken stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
                 forKey:@"access_token"];
     }
-    _fbDialog = [[FBDialog alloc] initWithURL:dialogURL params:params delegate:delegate];
-  }
+      
+    // If the developer sets "frictionlessRequests", it means two things
+    //  1. Show the "Don't show this again for these friends" checkbox (pass the frictionless param to server)
+    //  2. If the developer is sending a targeted request, then skip the loading screen
+    if (frictionless) {
+      [params setValue:@"1" forKey:@"frictionless"];
+    }
 
+    BOOL showLoadingScreen = !(frictionless && ([params objectForKey:@"to"] != nil));
+
+    _fbDialog = [[FBDialog alloc] initWithURL:dialogURL params:params showLoadingScreen:showLoadingScreen delegate:delegate];
+  }
   [_fbDialog show];
+}
+
+/**
+ * Generate a UI dialog for the request action.
+ * See overloaded method for parameter details.
+ */
+- (void)dialog:(NSString *)action
+   andDelegate:(id<FBDialogDelegate>)delegate {
+    NSMutableDictionary * params = [NSMutableDictionary dictionary];
+    [self dialog:action andParams:params andDelegate:delegate];
+}
+
+/**
+ * Generate a UI dialog for the request action with the provided parameters.
+ * See overloaded method for parameter details.
+ */
+- (void)dialog:(NSString *)action
+     andParams:(NSMutableDictionary *)params
+   andDelegate:(id <FBDialogDelegate>)delegate {
+    [self dialog:action andParams:params andFrictionlessRequests:false andDelegate:delegate];
 }
 
 /**

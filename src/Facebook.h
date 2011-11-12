@@ -82,6 +82,11 @@
      andParams:(NSMutableDictionary *)params
    andDelegate:(id <FBDialogDelegate>)delegate;
 
+- (void)dialog:(NSString *)action
+     andParams:(NSMutableDictionary *)params
+     andFrictionlessRequests:(BOOL)frictionless
+   andDelegate:(id <FBDialogDelegate>)delegate;
+
 - (BOOL)isSessionValid;
 
 @end

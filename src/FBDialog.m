@@ -264,6 +264,10 @@ params   = _params;
 - (void)dismiss:(BOOL)animated {
     [self dialogWillDisappear];
     
+    // If the dialog has been closed, then we need to cancel the order to open it.
+    // This happens in the case of a frictionless request, see webViewDidFinishLoad for details
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showWebView) object:nil];
+
     [_loadingURL release];
     _loadingURL = nil;
     
@@ -325,7 +329,7 @@ params   = _params;
         [self addSubview:_closeButton];
         
         _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:
-                    UIActivityIndicatorViewStyleWhiteLarge];
+                    UIActivityIndicatorViewStyleGray];
         _spinner.autoresizingMask =
         UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
         | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
@@ -358,6 +362,41 @@ params   = _params;
                                 rect.size.width - kBorderWidth*2, _webView.frame.size.height+1);
     
     [self strokeLines:webRect stroke:kBorderBlack];
+}
+
+// Display the dialog's WebView with a slick pop-up animation
+- (void)showWebView {
+    UIWindow* window = [UIApplication sharedApplication].keyWindow;
+    if (!window) {
+        window = [[UIApplication sharedApplication].windows objectAtIndex:0];
+    }
+    _modalBackgroundView.frame = window.frame;
+    [_modalBackgroundView addSubview:self];
+    [window addSubview:_modalBackgroundView];
+    
+    self.transform = CGAffineTransformScale([self transformForOrientation], 0.001, 0.001);
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:kTransitionDuration/1.5];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationDidStopSelector:@selector(bounce1AnimationStopped)];
+    self.transform = CGAffineTransformScale([self transformForOrientation], 1.1, 1.1);
+    [UIView commitAnimations];
+    
+    [self dialogWillAppear];
+    [self addObservers];
+}
+
+// Show a spinner during the loading time for the dialog. This is designed to show
+// on top of the webview but before the contents have loaded.
+- (void)showSpinner {
+    [_spinner sizeToFit];
+    [_spinner startAnimating];
+    _spinner.center = _webView.center;
+}
+
+- (void)hideSpinner {
+    [_spinner stopAnimating];
+    _spinner.hidden = YES;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -401,9 +440,16 @@ params   = _params;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    [_spinner stopAnimating];
-    _spinner.hidden = YES;
-    
+    if (!_showLoadingScreen) {
+      // If the app has asked for a frictionless call (no loadin screen), AND the user has already
+      // authorized the request, then the dialog URL will load and immediately redirect 
+      // to fbconnect://success. However, at this point we don't know yet whether it will
+      // redirect, so we need to set a timer for a short 50ms in the future. If the
+      // redirect happens, then the future selector will be cancelled
+      [self performSelector:@selector(showWebView) withObject:nil afterDelay:.05];
+    } else {
+      [self hideSpinner];
+    }
     [self updateWebOrientation];
 }
 
@@ -488,12 +534,14 @@ params   = _params;
 
 - (id)initWithURL: (NSString *) serverURL
            params: (NSMutableDictionary *) params
+           showLoadingScreen:(BOOL)showLoadingScreen
          delegate: (id <FBDialogDelegate>) delegate {
     
     self = [self init];
     _serverURL = [serverURL retain];
     _params = [params retain];
     _delegate = delegate;
+    _showLoadingScreen = showLoadingScreen;
     
     return self;
 }
@@ -530,32 +578,10 @@ params   = _params;
                                 innerWidth,
                                 self.frame.size.height - (1 + kBorderWidth*2));
     
-    [_spinner sizeToFit];
-    [_spinner startAnimating];
-    _spinner.center = _webView.center;
-    
-    UIWindow* window = [UIApplication sharedApplication].keyWindow;
-    if (!window) {
-        window = [[UIApplication sharedApplication].windows objectAtIndex:0];
+    if (_showLoadingScreen) {
+        [self showSpinner];
+        [self showWebView];
     }
-    
-    _modalBackgroundView.frame = window.frame;
-    [_modalBackgroundView addSubview:self];
-    [window addSubview:_modalBackgroundView];
-    
-    [window addSubview:self];
-    
-    [self dialogWillAppear];
-    
-    self.transform = CGAffineTransformScale([self transformForOrientation], 0.001, 0.001);
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:kTransitionDuration/1.5];
-    [UIView setAnimationDelegate:self];
-    [UIView setAnimationDidStopSelector:@selector(bounce1AnimationStopped)];
-    self.transform = CGAffineTransformScale([self transformForOrientation], 1.1, 1.1);
-    [UIView commitAnimations];
-    
-    [self addObservers];
 }
 
 - (void)dismissWithSuccess:(BOOL)success animated:(BOOL)animated {
