@@ -441,7 +441,7 @@ params   = _params;
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     if (!_showLoadingScreen) {
-      // If the app has asked for a frictionless call (no loadin screen), AND the user has already
+      // If the app has asked for a frictionless call (no loading screen), AND the user has already
       // authorized the request, then the dialog URL will load and immediately redirect 
       // to fbconnect://success. However, at this point we don't know yet whether it will
       // redirect, so we need to set a timer for a short 50ms in the future. If the
@@ -534,7 +534,7 @@ params   = _params;
 
 - (id)initWithURL: (NSString *) serverURL
            params: (NSMutableDictionary *) params
-           showLoadingScreen:(BOOL)showLoadingScreen
+showLoadingScreen: (BOOL)showLoadingScreen
          delegate: (id <FBDialogDelegate>) delegate {
     
     self = [self init];

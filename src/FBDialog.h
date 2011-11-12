@@ -54,8 +54,10 @@
 - (NSString *) getStringFromUrl: (NSString*) url needle:(NSString *) needle;
 
 /*
- * Initialize the dialog, specifying whether it should follow
- * frictionless rules (no loading screen).
+ * Initialize the dialog.
+ * @param  params             the parameters for this dialog, as specified in the public docs
+ * @param  showLoadingScreen  if true, the dialog pops up immediately with a spinner
+ *                            if false, nothing happens until the dialog is fully loaded, then shows all at once
  */
 - (id)initWithURL: (NSString *) loadingURL
            params: (NSMutableDictionary *) params
