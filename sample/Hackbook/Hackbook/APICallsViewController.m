@@ -1050,8 +1050,9 @@
         {
             NSArray *resultData = [result objectForKey:@"data"];
             if ([resultData count] > 0) {
-                NSString* friend = [[resultData objectAtIndex:(arc4random() % [resultData count])] objectForKey:@"id"];
-                [self apiDialogRequestsSendTarget:friend];
+                int randomIndex = arc4random() % [resultData count];
+                NSString* randomFriend = [[resultData objectAtIndex:randomIndex] objectForKey:@"id"];
+                [self apiDialogRequestsSendTarget:randomFriend];
             } else {
                 [self showMessage:@"You have no friends to select."];
             }

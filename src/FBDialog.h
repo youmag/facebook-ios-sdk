@@ -35,7 +35,7 @@
   UIButton* _closeButton;
   UIInterfaceOrientation _orientation;
   BOOL _showingKeyboard;
-  BOOL _showLoadingScreen;
+  BOOL _suppressLoadingScreen;
 
   // Ensures that UI elements behind the dialog are disabled.
   UIView* _modalBackgroundView;
@@ -56,12 +56,11 @@
 /*
  * Initialize the dialog.
  * @param  params             the parameters for this dialog, as specified in the public docs
- * @param  showLoadingScreen  if true, the dialog pops up immediately with a spinner
- *                            if false, nothing happens until the dialog is fully loaded, then shows all at once
+ * @param  suppressLoadingScreen  if true, then developers should implement their own loading spinner
  */
 - (id)initWithURL: (NSString *) loadingURL
            params: (NSMutableDictionary *) params
-showLoadingScreen: (BOOL) showLoadingScreen
+suppressLoadingScreen: (BOOL) suppressLoadingScreen
          delegate: (id <FBDialogDelegate>) delegate;
 
 /**

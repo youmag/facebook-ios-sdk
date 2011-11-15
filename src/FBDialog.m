@@ -440,7 +440,7 @@ params   = _params;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    if (!_showLoadingScreen) {
+    if (_suppressLoadingScreen) {
       // If the app has asked for a frictionless call (no loading screen), AND the user has already
       // authorized the request, then the dialog URL will load and immediately redirect 
       // to fbconnect://success. However, at this point we don't know yet whether it will
@@ -534,14 +534,14 @@ params   = _params;
 
 - (id)initWithURL: (NSString *) serverURL
            params: (NSMutableDictionary *) params
-showLoadingScreen: (BOOL)showLoadingScreen
+suppressLoadingScreen: (BOOL)suppressLoadingScreen
          delegate: (id <FBDialogDelegate>) delegate {
     
     self = [self init];
     _serverURL = [serverURL retain];
     _params = [params retain];
     _delegate = delegate;
-    _showLoadingScreen = showLoadingScreen;
+    _suppressLoadingScreen = suppressLoadingScreen;
     
     return self;
 }
@@ -578,7 +578,7 @@ showLoadingScreen: (BOOL)showLoadingScreen
                                 innerWidth,
                                 self.frame.size.height - (1 + kBorderWidth*2));
     
-    if (_showLoadingScreen) {
+    if (!_suppressLoadingScreen) {
         [self showSpinner];
         [self showWebView];
     }

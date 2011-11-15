@@ -596,9 +596,9 @@ static NSString* kSDKVersion = @"2";
       [params setValue:@"1" forKey:@"frictionless"];
     }
 
-    BOOL showLoadingScreen = !(frictionless && ([params objectForKey:@"to"] != nil));
+    BOOL suppressLoadingScreen = !(frictionless && ([params objectForKey:@"to"] != nil));
 
-    _fbDialog = [[FBDialog alloc] initWithURL:dialogURL params:params showLoadingScreen:showLoadingScreen delegate:delegate];
+    _fbDialog = [[FBDialog alloc] initWithURL:dialogURL params:params suppressLoadingScreen:suppressLoadingScreen delegate:delegate];
   }
   [_fbDialog show];
 }
