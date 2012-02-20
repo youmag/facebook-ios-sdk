@@ -40,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // FBDialog
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wselector"
 /**
  * Override FBDialog : to call when the webView Dialog did succeed
  */
@@ -90,5 +91,7 @@
     }
   }
 }
+
+#pragma clang diagnostic pop
 
 @end

@@ -15,7 +15,6 @@
  */
 
 #import "FBRequest.h"
-#import "JSON.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // global
@@ -188,7 +187,6 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
   NSString* responseString = [[[NSString alloc] initWithData:data
                                                     encoding:NSUTF8StringEncoding]
                               autorelease];
-  SBJSON *jsonParser = [[SBJSON new] autorelease];
   if ([responseString isEqualToString:@"true"]) {
     return [NSDictionary dictionaryWithObject:@"true" forKey:@"result"];
   } else if ([responseString isEqualToString:@"false"]) {
@@ -202,10 +200,10 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
   }
 
 
-  id result = [jsonParser objectWithString:responseString];
+  id result = [responseString objectFromJSONString];
 
   if (![result isKindOfClass:[NSArray class]]) {
-    if ([result objectForKey:@"error"] != nil) {
+    if ([(NSDictionary *)result objectForKey:@"error"] != nil) {
       if (error != nil) {
         *error = [self formError:kGeneralErrorCode
                         userInfo:result];
@@ -213,20 +211,20 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
       return nil;
     }
 
-    if ([result objectForKey:@"error_code"] != nil) {
+    if ([(NSDictionary *)result objectForKey:@"error_code"] != nil) {
       if (error != nil) {
-        *error = [self formError:[[result objectForKey:@"error_code"] intValue] userInfo:result];
+        *error = [self formError:[[ (NSDictionary *)result objectForKey:@"error_code"] intValue] userInfo:result];
       }
       return nil;
     }
 
-    if ([result objectForKey:@"error_msg"] != nil) {
+    if ([(NSDictionary *)result objectForKey:@"error_msg"] != nil) {
       if (error != nil) {
         *error = [self formError:kGeneralErrorCode userInfo:result];
       }
     }
 
-    if ([result objectForKey:@"error_reason"] != nil) {
+    if ([(NSDictionary *)result objectForKey:@"error_reason"] != nil) {
       if (error != nil) {
         *error = [self formError:kGeneralErrorCode userInfo:result];
       }

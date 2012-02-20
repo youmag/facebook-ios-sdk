@@ -37,6 +37,9 @@ static const int kTokenExtendThreshold = 24;
 static NSString *requestFinishedKeyPath = @"state";
 static void *finishedContext = @"finishedContext";
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wselector"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 @interface Facebook ()
@@ -749,8 +752,8 @@ static void *finishedContext = @"finishedContext";
 
 - (void)request:(FBRequest *)request didLoad:(id)result {
   _isExtendingAccessToken = NO;
-  NSString* accessToken = [result objectForKey:@"access_token"];
-  NSString* expTime = [result objectForKey:@"expires_at"];
+  NSString* accessToken = [(NSDictionary*)result objectForKey:@"access_token"];
+  NSString* expTime = [(NSDictionary*)result objectForKey:@"expires_at"];
 
   if (accessToken == nil || expTime == nil) {
    return;
@@ -780,5 +783,7 @@ static void *finishedContext = @"finishedContext";
 
 - (void)requestLoading:(FBRequest *)request{
 }
+
+#pragma clang diagnostic pop
 
 @end

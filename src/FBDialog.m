@@ -21,15 +21,18 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // global
 
-static CGFloat kBorderGray[4] = {0.3, 0.3, 0.3, 0.8};
-static CGFloat kBorderBlack[4] = {0.3, 0.3, 0.3, 1};
+static CGFloat kBorderGray[4] = {0.3f, 0.3f, 0.3f, 0.8f};
+static CGFloat kBorderBlack[4] = {0.3f, 0.3f, 0.3f, 1};
 
-static CGFloat kTransitionDuration = 0.3;
+static CGFloat kTransitionDuration = 0.3f;
 
 static CGFloat kPadding = 0;
 static CGFloat kBorderWidth = 10;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wselector"
 
 static BOOL FBIsDeviceIPad() {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 30200
@@ -39,6 +42,9 @@ static BOOL FBIsDeviceIPad() {
 #endif
     return NO;
 }
+
+#pragma clang diagnostic pop
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,17 +64,17 @@ params   = _params;
         CGContextTranslateCTM(context, CGRectGetMinX(rect), CGRectGetMinY(rect));
         CGContextAddRect(context, rect);
     } else {
-        rect = CGRectOffset(CGRectInset(rect, 0.5, 0.5), 0.5, 0.5);
-        CGContextTranslateCTM(context, CGRectGetMinX(rect)-0.5, CGRectGetMinY(rect)-0.5);
+        rect = CGRectOffset(CGRectInset(rect, 0.5f, 0.5f), 0.5f, 0.5f);
+        CGContextTranslateCTM(context, CGRectGetMinX(rect)-0.5f, CGRectGetMinY(rect)-0.5f);
         CGContextScaleCTM(context, radius, radius);
         float fw = CGRectGetWidth(rect) / radius;
         float fh = CGRectGetHeight(rect) / radius;
         
-        CGContextMoveToPoint(context, fw, fh/2);
-        CGContextAddArcToPoint(context, fw, fh, fw/2, fh, 1);
-        CGContextAddArcToPoint(context, 0, fh, 0, fh/2, 1);
-        CGContextAddArcToPoint(context, 0, 0, fw/2, 0, 1);
-        CGContextAddArcToPoint(context, fw, 0, fw, fh/2, 1);
+        CGContextMoveToPoint(context, fw, fh/2.0f);
+        CGContextAddArcToPoint(context, fw, fh, fw/2.0f, fh, 1);
+        CGContextAddArcToPoint(context, 0, fh, 0, fh/2.0f, 1);
+        CGContextAddArcToPoint(context, 0, 0, fw/2.0f, 0, 1);
+        CGContextAddArcToPoint(context, fw, 0, fw, fh/2.0f, 1);
     }
     
     CGContextClosePath(context);
@@ -101,26 +107,26 @@ params   = _params;
     CGContextSaveGState(context);
     CGContextSetStrokeColorSpace(context, space);
     CGContextSetStrokeColor(context, strokeColor);
-    CGContextSetLineWidth(context, 1.0);
+    CGContextSetLineWidth(context, 1.0f);
     
     {
-        CGPoint points[] = {{rect.origin.x+0.5, rect.origin.y-0.5},
-            {rect.origin.x+rect.size.width, rect.origin.y-0.5}};
+        CGPoint points[] = {{rect.origin.x+0.5f, rect.origin.y-0.5f},
+            {rect.origin.x+rect.size.width, rect.origin.y-0.5f}};
         CGContextStrokeLineSegments(context, points, 2);
     }
     {
-        CGPoint points[] = {{rect.origin.x+0.5, rect.origin.y+rect.size.height-0.5},
-            {rect.origin.x+rect.size.width-0.5, rect.origin.y+rect.size.height-0.5}};
+        CGPoint points[] = {{rect.origin.x+0.5f, rect.origin.y+rect.size.height-0.5f},
+            {rect.origin.x+rect.size.width-0.5f, rect.origin.y+rect.size.height-0.5f}};
         CGContextStrokeLineSegments(context, points, 2);
     }
     {
-        CGPoint points[] = {{rect.origin.x+rect.size.width-0.5, rect.origin.y},
-            {rect.origin.x+rect.size.width-0.5, rect.origin.y+rect.size.height}};
+        CGPoint points[] = {{rect.origin.x+rect.size.width-0.5f, rect.origin.y},
+            {rect.origin.x+rect.size.width-0.5f, rect.origin.y+rect.size.height}};
         CGContextStrokeLineSegments(context, points, 2);
     }
     {
-        CGPoint points[] = {{rect.origin.x+0.5, rect.origin.y},
-            {rect.origin.x+0.5, rect.origin.y+rect.size.height}};
+        CGPoint points[] = {{rect.origin.x+0.5f, rect.origin.y},
+            {rect.origin.x+0.5f, rect.origin.y+rect.size.height}};
         CGContextStrokeLineSegments(context, points, 2);
     }
     
@@ -143,11 +149,11 @@ params   = _params;
 - (CGAffineTransform)transformForOrientation {
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (orientation == UIInterfaceOrientationLandscapeLeft) {
-        return CGAffineTransformMakeRotation(M_PI*1.5);
+        return CGAffineTransformMakeRotation((CGFloat)M_PI*1.5f);
     } else if (orientation == UIInterfaceOrientationLandscapeRight) {
-        return CGAffineTransformMakeRotation(M_PI/2);
+        return CGAffineTransformMakeRotation((CGFloat)M_PI/2.0f);
     } else if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        return CGAffineTransformMakeRotation(-M_PI);
+        return CGAffineTransformMakeRotation((CGFloat)-M_PI);
     } else {
         return CGAffineTransformIdentity;
     }
@@ -160,8 +166,8 @@ params   = _params;
     
     CGRect frame = [UIScreen mainScreen].applicationFrame;
     CGPoint center = CGPointMake(
-                                 frame.origin.x + ceil(frame.size.width/2),
-                                 frame.origin.y + ceil(frame.size.height/2));
+                                 frame.origin.x + (CGFloat)ceil(frame.size.width/2.0f),
+                                 frame.origin.y + (CGFloat)ceil(frame.size.height/2.0f));
     
     CGFloat scale_factor = 1.0f;
     if (FBIsDeviceIPad()) {
@@ -169,8 +175,8 @@ params   = _params;
         scale_factor = 0.6f;
     }
     
-    CGFloat width = floor(scale_factor * frame.size.width) - kPadding * 2;
-    CGFloat height = floor(scale_factor * frame.size.height) - kPadding * 2;
+    CGFloat width = (CGFloat)floor(scale_factor * frame.size.width) - kPadding * 2;
+    CGFloat height = (CGFloat)floor(scale_factor * frame.size.height) - kPadding * 2;
     
     _orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (UIInterfaceOrientationIsLandscape(_orientation)) {
@@ -198,16 +204,16 @@ params   = _params;
 
 - (void)bounce1AnimationStopped {
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:kTransitionDuration/2];
+    [UIView setAnimationDuration:kTransitionDuration/2.0f];
     [UIView setAnimationDelegate:self];
     [UIView setAnimationDidStopSelector:@selector(bounce2AnimationStopped)];
-    self.transform = CGAffineTransformScale([self transformForOrientation], 0.9, 0.9);
+    self.transform = CGAffineTransformScale([self transformForOrientation], 0.9f, 0.9f);
     [UIView commitAnimations];
 }
 
 - (void)bounce2AnimationStopped {
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:kTransitionDuration/2];
+    [UIView setAnimationDuration:kTransitionDuration/2.0f];
     self.transform = [self transformForOrientation];
     [UIView commitAnimations];
 }
@@ -304,7 +310,7 @@ params   = _params;
         
         UIImage* closeImage = [UIImage imageNamed:@"FBDialog.bundle/images/close.png"];
         
-        UIColor* color = [UIColor colorWithRed:167.0/255 green:184.0/255 blue:216.0/255 alpha:1];
+        UIColor* color = [UIColor colorWithRed:167.0f/255.0f green:184.0f/255.0f blue:216.0f/255.0f alpha:1.0f];
         _closeButton = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
         [_closeButton setImage:closeImage forState:UIControlStateNormal];
         [_closeButton setTitleColor:color forState:UIControlStateNormal];
@@ -354,7 +360,7 @@ params   = _params;
     [self drawRect:rect fill:kBorderGray radius:0];
     
     CGRect webRect = CGRectMake(
-                                ceil(rect.origin.x + kBorderWidth), ceil(rect.origin.y + kBorderWidth)+1,
+                                (CGFloat)ceil(rect.origin.x + kBorderWidth), (CGFloat)ceil(rect.origin.y + kBorderWidth)+1,
                                 rect.size.width - kBorderWidth*2, _webView.frame.size.height+1);
     
     [self strokeLines:webRect stroke:kBorderBlack];
@@ -422,7 +428,7 @@ params   = _params;
     if (!_showingKeyboard && [self shouldRotateToOrientation:orientation]) {
         [self updateWebOrientation];
         
-        CGFloat duration = [UIApplication sharedApplication].statusBarOrientationAnimationDuration;
+        CGFloat duration = (CGFloat)[UIApplication sharedApplication].statusBarOrientationAnimationDuration;
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:duration];
         [self sizeToFitOrientation:YES];
@@ -547,12 +553,12 @@ params   = _params;
     
     [self dialogWillAppear];
     
-    self.transform = CGAffineTransformScale([self transformForOrientation], 0.001, 0.001);
+    self.transform = CGAffineTransformScale([self transformForOrientation], 0.001f, 0.001f);
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:kTransitionDuration/1.5];
     [UIView setAnimationDelegate:self];
     [UIView setAnimationDidStopSelector:@selector(bounce1AnimationStopped)];
-    self.transform = CGAffineTransformScale([self transformForOrientation], 1.1, 1.1);
+    self.transform = CGAffineTransformScale([self transformForOrientation], 1.1f, 1.1f);
     [UIView commitAnimations];
     
     [self addObservers];
