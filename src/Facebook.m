@@ -509,18 +509,16 @@ static void *finishedContext = @"finishedContext";
  */
 - (FBRequest*)requestWithParams:(NSMutableDictionary *)params
                     andDelegate:(id <FBRequestDelegate>)delegate {
-  if ([params objectForKey:@"method"] == nil) {
-    NSLog(@"API Method must be specified");
-    return nil;
-  }
 
-  NSString * methodName = [params objectForKey:@"method"];
-  [params removeObjectForKey:@"method"];
-
-  return [self requestWithMethodName:methodName
-                           andParams:params
-                       andHttpMethod:@"GET"
-                         andDelegate:delegate];
+    NSAssert([params objectForKey:@"method"], @"API Method must be specified", nil);
+    
+    NSString * methodName = [params objectForKey:@"method"];
+    [params removeObjectForKey:@"method"];
+    
+    return [self requestWithMethodName:methodName
+                             andParams:params
+                         andHttpMethod:@"GET"
+                           andDelegate:delegate];
 }
 
 /**
